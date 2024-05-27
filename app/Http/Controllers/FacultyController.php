@@ -12,6 +12,8 @@ use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\DB;
+
 
 class FacultyController extends Controller
 {
@@ -24,11 +26,24 @@ class FacultyController extends Controller
     {
         abort_unless(Gate::allows('super_access'), 403);
         $lists = Faculty::where('name', 'LIKE', "%" . $request->search . "%")->orderBy("created_at", "desc")->get();
-        $users = User::where('email_verified_at', '!=', null)
-            ->join('role_user', 'users.id', '=', 'role_user.user_id')
-            ->join('roles', 'role_user.user_id', '=', 'roles.id')
-            ->where('roles.title', '=', 'Instructor')
-            ->get();
+        // $users = User::where('email_verified_at', '!=', null)
+        //     ->join('role_user', 'users.id', '=', 'role_user.user_id')
+        //     ->join('roles', 'role_user.user_id', '=', 'roles.id')
+        //     ->where('roles.title', '=', 'Instructor')
+        //     ->get();
+
+        $ausers = User::all();
+        $users = [];
+
+        foreach ($ausers as $user) {
+            $roles = DB::select('select * from role_user where user_id = ?', [$user->id]);
+            foreach ($roles as $key => $role) {
+                if($role->role_id == 2){
+                    $users[] = $user;
+                }
+            }
+        }
+
         return view('faculties.index', compact('lists', 'users'));
     }
 

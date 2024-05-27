@@ -110,10 +110,12 @@
                                 <button onclick="deleteFaculty('{{ $list->id }}')"
                                     class="bg-red-700 p-2 text-white rounded mt-2 w-24 px-6">Delete</button>
                             </div>
+
+
                             <!-- Modal -->
                             <div id="editModal"
-                                class="modal fixed w-full h-full top-48 left-0 flex items-center justify-center"
-                                style="display: none;">
+                                class="modal fixed h-full top-48 left-0"
+                                style="display: none; z-index: 999 !important;">
                                 {{-- <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div> --}}
 
                                 <div
@@ -158,7 +160,7 @@
                                             <!-- Footer -->
                                             <div class="mt-4 flex justify-end">
                                                 <button type="reset"
-                                                    class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2"
+                                                    class="px-4 bg-transparent p-3 rounded-lg text-white hover:bg-gray-100 hover:text-gray-900 mr-2"
                                                     onclick="closeModal()">Cancel</button>
                                                 <button type="submit"
                                                     class="modal-close px-4 bg-gray-500 p-3 rounded-lg text-white hover:bg-gray-400">Save</button>
@@ -168,6 +170,10 @@
                                     </div>
                                 </div>
                             </div>
+
+
+
+
                         </div>
                     @endforeach
                 </div>
@@ -178,6 +184,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
+
         function status(id,status) {
             let text = "Please Confirm to delete\nPress Ok or Cancel.";
             if (confirm(text) == true) {
@@ -221,6 +228,8 @@
         }
 
         function showModal(id, name, idNo, email, contact) {
+            $(".overlay").show();
+
             document.getElementById('editModal').style.display = 'block';
             document.getElementById('editModal').style.margin = 'auto';
             document.getElementById('editModal').style.width = '100%';
@@ -234,6 +243,8 @@
 
         function closeModal() {
             document.getElementById('editModal').style.display = 'none';
+            $(".overlay").hide();
+
         }
     </script>
 

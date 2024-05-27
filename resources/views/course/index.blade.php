@@ -216,12 +216,12 @@
                             </div>
                             <!-- Modal -->
                             <div id="editModal"
-                                class="modal fixed w-full h-full top-4 left-0 flex items-center justify-center overflow-y-auto"
-                                style="display: none;">
+                                class="modal fixed w-full h-full bottom-0 left-0 flex items-center justify-center overflow-y-auto"
+                                style="display: none; z-index: 999 !important; ">
                                 {{-- <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div> --}}
 
                                 <div
-                                    class="modal-container bg-gray-700 w-11/12 md:max-w-2xl mx-auto rounded shadow-lg z-50 overflow-y-auto">
+                                    class="modal-container bg-gray-700 w-full mx-auto rounded shadow-lg z-50 overflow-y-auto">
 
                                     <!-- Modal content -->
                                     <div class="modal-content py-4 w-full text-left px-6">
@@ -395,6 +395,8 @@
         }
 
         function showModal(id, c_type, subject, subjectCode, block, unit, t_start, t_end, status, des) {
+            $(".overlay").show();
+
             document.getElementById('editModal').style.display = 'block';
             document.getElementById('editModal').style.margin = 'auto';
             document.getElementById('editModal').style.width = '100%';
@@ -421,6 +423,8 @@
 
         function closeModal() {
             document.getElementById('editModal').style.display = 'none';
+            $(".overlay").hide();
+
         }
     </script>
 

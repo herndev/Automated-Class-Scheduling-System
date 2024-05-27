@@ -14,9 +14,22 @@
     <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid/main.css" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+    z-index: 999; /* Ensure it's on top of everything */
+  }
+    </style>
 </head>
 
 <body>
+    <div class="overlay"></div>
     <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-gray-200 font-roboto">
         @include('layouts.navigation')
 
@@ -34,6 +47,7 @@
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.3/echo.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     const audio = document.getElementById('alertAudio');
     const audioFire = document.getElementById('alertFire');
@@ -77,6 +91,8 @@
     //     });
     // const audio = document.getElementById('alertAudio');
     // audio.play();
+    $(".overlay").hide();
+
 </script>
 
 </html>
