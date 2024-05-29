@@ -45,10 +45,55 @@ class DashboardController extends Controller
             // ->where('appointments.semester', 'LIKE', "%" . $request->semester . "%")
             ->get();
 
+            $scheds = [];
+            $filteredAppointments = [];
+        
+        if(sizeof($appointments) == 0){
+            $appointments = Appointment::select(
+                'courses.subject as subject',
+                'courses.subjectCode as code',
+                'courses.time_start as start',
+                'courses.time_end as end',
+                'rooms.name as room',
+                'courses.day as day',
+                'appointments.month_start as m_start',
+                'appointments.month_end as m_end',
+                'appointments.id as id',
+                'courses.subject as subject',
+                'courses.subjectCode as s_code'
+            )
+            ->join('courses', 'courses.id', '=', 'appointments.course_id')
+            ->join('rooms', 'courses.room_id', '=', 'rooms.id')
+                ->get();
+            
+            
+            $rscheds = Schedule::select(
+                'appointment_id',
+            )->where("user_id", Auth::user()->id)
+                ->get();
+            
+            $scheds = [];
+
+            foreach ($rscheds as $rsched) {
+                $scheds[] = $rsched->appointment_id;
+            }
+            
+            foreach ($appointments as $appointment) {
+                if (in_array($appointment->id, $scheds)) {
+                    $filteredAppointments[] = $appointment;
+                }
+            }
+
+            $appointments = $filteredAppointments;
+        }
+        
+        // dd($appointments, Auth::user()->id, sizeof($appointments) == 0, $scheds, $filteredAppointments);
+
         for ($day = 1; $day <= 31; $day++) {
             // Loop through each appointment
             foreach ($appointments as $appointment) {
                 // Split the days string into an array of individual days
+                $appointment->day = str_ireplace(' ', '', $appointment->day);
                 $selectedDays = explode(',', $appointment->day);
 
                 // Loop through each selected day
@@ -57,7 +102,8 @@ class DashboardController extends Controller
                     $startDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->start . ':00';
 
                     // Extract end date and time from the appointment
-                    $endDateTime = $appointment->m_end . '-' . $day . ' ' . $appointment->end . ':00';
+                    // $endDateTime = $appointment->m_end . '-' . $day . ' ' . $appointment->end . ':00';
+                    $endDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->end . ':00';
 
                     // Check if the appointment falls on the selected day
                     if (date('l', strtotime($startDateTime)) == $selectedDay) {
