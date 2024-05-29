@@ -58,21 +58,26 @@ class ScheduleController extends Controller
     {
         try {
             $check = Schedule::where('appointment_id', $request->appointment_id)
-                ->where('user_id', Auth::user()->id)->first();
-            if ($check != '') {
-                redirect(route("subject"))->with('success', 'Subject Already Exist!');
+                ->where('user_id', $request->user_id)->first();
+
+                // dd($request->user_id, $request->appointment_id, ($check != null));
+
+            if ($check != null) {
+                return redirect()->back()->with('success', 'Subject Already Exist!');
             } else {
                 $add = new Schedule();
-                $add->user_id = Auth::user()->id;
+                $add->user_id = $request->user_id;
                 $add->appointment_id = $request->appointment_id;
                 $add->save();
 
-                redirect(route("subject"))->with('success', 'Created Successfully');
+                return redirect()->back()->with('success', 'Created Successfully');
             }
 
         } catch (\Throwable $th) {
-            return response()->json($th, 400);
+            // return response()->json($th, 400);
+            return redirect()->back()->with('success', response()->json($th, 400));
         }
+        return redirect()->back()->with('success', 'Something went wrong');
     }
 
     public function subject(Request $request)

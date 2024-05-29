@@ -241,6 +241,8 @@ class FacultyController extends Controller
             ->where('roles.title', '=', 'Student')
             ->get();
         $subjects = Appointment::join('courses', 'appointments.course_id', '=', 'courses.id')->get();
+        // $subjects = Course::all();
+        
         return view('student.schedule.index', compact('events', 'users', 'subjects'));
     }
 
