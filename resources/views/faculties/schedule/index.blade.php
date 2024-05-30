@@ -103,7 +103,7 @@
                         Select
                     </option>
                     @foreach ($users as $user)
-                        <option value="{{ $user->id }}">
+                        <option value="{{ $user->id }}" @if($user->id == $user_id) selected @endif>
                             {{ $user->name }}
                         </option>
                     @endforeach

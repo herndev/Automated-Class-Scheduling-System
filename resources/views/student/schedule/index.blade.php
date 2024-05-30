@@ -57,7 +57,7 @@
                                                 Select
                                             </option>
                                             @foreach ($subjects as $subject)
-                                                <option value="{{ $subject->id }}">
+                                                <option value="{{ $subject->appointment_id }}">
                                                     {{ $subject->subjectCode }}
                                                 </option>
                                             @endforeach
@@ -79,7 +79,7 @@
                         Select
                     </option>
                     @foreach ($users as $user)
-                        <option value="{{ $user->id }}">
+                        <option value="{{ $user->id }}" @if($user->id == $user_id) selected @endif>
                             {{ $user->name }}
                         </option>
                     @endforeach
@@ -109,6 +109,7 @@
     });
 
     function selectUser(id) {
+    console.log(id)
         $.ajax({
             type: 'GET',
             url: 'schedule',

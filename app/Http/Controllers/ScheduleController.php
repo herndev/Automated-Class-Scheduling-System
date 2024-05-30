@@ -57,9 +57,23 @@ class ScheduleController extends Controller
     public function addSchedule(Request $request)
     {
         try {
+            // $roles = User::find($request->user_id)->first()->roles;
+            // $role = "";
+
+            // foreach ($roles as $key => $roless) {
+            //     if(in_array($roless->title,['Student', 'Instructor', 'SuperAdmin'])){
+            //         $role = $roless->title;
+            //         break;
+            //     }
+            // }
+            
             $check = Schedule::where('appointment_id', $request->appointment_id)
                 ->where('user_id', $request->user_id)->first();
 
+            // if($role == "Student"){
+            //     $check = Schedule::where('appointment_id', $request->appointment_id)
+            //     ->where('user_id', $request->user_id)->first();
+            // }
                 // dd($request->user_id, $request->appointment_id, ($check != null));
 
             if ($check != null) {
@@ -175,6 +189,8 @@ class ScheduleController extends Controller
     {
         $events = [];
         $studentSchedules = [];
+        $user_id = $request->user_id;
+
         $studentSchedules = Schedule::join('users', 'schedules.user_id', '=', 'users.id')
         ->join('appointments', 'schedules.appointment_id', 'schedules.id')
             ->join('courses', 'appointments.course_id', '=', 'courses.id')
@@ -189,25 +205,77 @@ class ScheduleController extends Controller
             ];
         }
         // dd($events);
-        return view('block.student.index', compact('events'));
+        return view('block.student.index', compact('events', 'user_id'));
     }
 
     public function instructorSchedule(Request $request)
     {
         $events = [];
         $instructorSchedules = [];
-        $instructorSchedules = Appointment::join('courses', 'appointments.course_id', '=', 'courses.id')
-            ->where('appointments.user_id', 'LIKE', "%" . $request->user_id . "%")->get();
+        $user_id = $request->user_id ?? "";
+        // $instructorSchedules = Appointment::join('courses', 'appointments.course_id', '=', 'courses.id')
+        //     ->where('appointments.user_id', 'LIKE', "%" . $request->user_id . "%")->get();
 
-        foreach ($instructorSchedules as $instructorSchedule) {
-            $events[] = [
-                'title' => $instructorSchedule->subject.' '.$instructorSchedule->subjectCode,
-                'start' => $instructorSchedule->month_start . '-05' . ' ' . $instructorSchedule->time_start . ':00',
-                'end' => $instructorSchedule->month_end . '-05' . ' ' . $instructorSchedule->time_end . ':00',
-                'description' => 'html: <b>' . $instructorSchedule->description . '</b>',
-            ];
+        // foreach ($instructorSchedules as $instructorSchedule) {
+        //     $events[] = [
+        //         'title' => $instructorSchedule->subject.' '.$instructorSchedule->subjectCode,
+        //         'start' => $instructorSchedule->month_start . '-05' . ' ' . $instructorSchedule->time_start . ':00',
+        //         'end' => $instructorSchedule->month_end . '-05' . ' ' . $instructorSchedule->time_end . ':00',
+        //         'description' => 'html: <b>' . $instructorSchedule->description . '</b>',
+        //     ];
+        // }
+
+        $appointments = Appointment::select(
+            'courses.subject as subject',
+            'courses.subjectCode as code',
+            'courses.time_start as start',
+            'courses.time_end as end',
+            'rooms.name as room',
+            'courses.day as day',
+            'appointments.month_start as m_start',
+            'appointments.month_end as m_end',
+            'courses.subject as subject',
+            'courses.subjectCode as s_code'
+        )->with(['user'])->where('user_id', $user_id)
+            ->join('courses', 'appointments.course_id', '=', 'courses.id')
+            ->join('rooms', 'courses.room_id', '=', 'rooms.id')
+            // ->where('appointments.semester', 'LIKE', "%" . $request->semester . "%")
+            ->get();
+
+            $scheds = [];
+            $filteredAppointments = [];
+        
+
+        for ($day = 1; $day <= 31; $day++) {
+            // Loop through each appointment
+            foreach ($appointments as $appointment) {
+                // Split the days string into an array of individual days
+                $appointment->day = str_ireplace(' ', '', $appointment->day);
+                $selectedDays = explode(',', $appointment->day);
+
+                // Loop through each selected day
+                foreach ($selectedDays as $selectedDay) {
+                    // Extract start date and time from the appointment
+                    $startDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->start . ':00';
+
+                    // Extract end date and time from the appointment
+                    // $endDateTime = $appointment->m_end . '-' . $day . ' ' . $appointment->end . ':00';
+                    $endDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->end . ':00';
+
+                    // Check if the appointment falls on the selected day
+                    if (date('l', strtotime($startDateTime)) == $selectedDay) {
+                        // Add the event to the events array
+                        $events[] = [
+                            'title' => $appointment->subject,
+                            'start' => $startDateTime,
+                            'end' => $endDateTime,
+                        ];
+                    }
+                }
+            }
         }
-        return view('block.instructor.index', compact('events'));
+
+        return view('block.instructor.index', compact('events', 'user_id'));
     }
 
     /**

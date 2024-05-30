@@ -27,6 +27,16 @@ class DashboardController extends Controller
     {
         // abort_unless(Gate::allows('admin_access'), 403);
         $events = [];
+        $roles = Auth::user()->roles;
+        $role = "";
+
+        foreach ($roles as $key => $roless) {
+            if(in_array($roless->title,['Student', 'Instructor', 'SuperAdmin'])){
+                $role = $roless->title;
+                break;
+            }
+        }
+
 
         $appointments = Appointment::select(
             'courses.subject as subject',
@@ -48,7 +58,7 @@ class DashboardController extends Controller
             $scheds = [];
             $filteredAppointments = [];
         
-        if(sizeof($appointments) == 0){
+        if($role == "Student"){
             $appointments = Appointment::select(
                 'courses.subject as subject',
                 'courses.subjectCode as code',

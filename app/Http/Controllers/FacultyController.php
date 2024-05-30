@@ -147,103 +147,233 @@ class FacultyController extends Controller
 
     public function schedule(Request $request)
     {
+        $user_id = $request->search;
+
         // dd($request->search);
         abort_unless(Gate::allows('super_access'), 403);
         $lists = Faculty::where('name', 'LIKE', "%" . $request->search . "%")->orderBy("created_at", "desc")->get();
         $events = [];
         $appointments = [];
         if ($request->search) {
-            $appointments = Appointment::with(['user'])
-                ->join('courses', 'appointments.course_id', '=', 'courses.id')
-                ->where('appointments.user_id', 'LIKE', "%" . $request->search . "%")->get();
+            // $appointments = Appointment::with(['user'])
+            //     ->join('courses', 'appointments.course_id', '=', 'courses.id')
+            //     ->where('appointments.user_id', 'LIKE', "%" . $request->search . "%")->get();
             // dd($appointments);
-        }
-        for ($day = 1; $day <= 31; $day++) {
-            // Loop through each appointment
-            foreach ($appointments as $appointment) {
-                // Split the days string into an array of individual days
-                $selectedDays = explode(',', $appointment->day);
 
-                // Loop through each selected day
-                foreach ($selectedDays as $selectedDay) {
-                    // Extract start date and time from the appointment
-                    $startDateTime = $appointment->month_start . '-' . $day . ' ' . $appointment->time_start . ':00';
 
-                    // Extract end date and time from the appointment
-                    $endDateTime = $appointment->month_end . '-' . $day . ' ' . $appointment->time_end . ':00';
-
-                    // Check if the appointment falls on the selected day
-                    if (date('l', strtotime($startDateTime)) == $selectedDay) {
-                        // Add the event to the events array
-                        $events[] = [
-                            'title' => $appointment->user_id,
-                            'start' => $startDateTime,
-                            'end' => $endDateTime,
-                            'description' => 'html: <b>' . $appointment->description . '</b>',
-                        ];
+            $appointments = Appointment::select(
+                'courses.subject as subject',
+                'courses.subjectCode as code',
+                'courses.time_start as start',
+                'courses.time_end as end',
+                'rooms.name as room',
+                'courses.day as day',
+                'appointments.month_start as m_start',
+                'appointments.month_end as m_end',
+                'courses.subject as subject',
+                'courses.subjectCode as s_code'
+            )->with(['user'])->where('user_id', $user_id)
+                ->join('courses', 'appointments.course_id', '=', 'courses.id')
+                ->join('rooms', 'courses.room_id', '=', 'rooms.id')
+                // ->where('appointments.semester', 'LIKE', "%" . $request->semester . "%")
+                ->get();
+    
+                $scheds = [];
+                $filteredAppointments = [];
+            
+    
+            for ($day = 1; $day <= 31; $day++) {
+                // Loop through each appointment
+                foreach ($appointments as $appointment) {
+                    // Split the days string into an array of individual days
+                    $appointment->day = str_ireplace(' ', '', $appointment->day);
+                    $selectedDays = explode(',', $appointment->day);
+    
+                    // Loop through each selected day
+                    foreach ($selectedDays as $selectedDay) {
+                        // Extract start date and time from the appointment
+                        $startDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->start . ':00';
+    
+                        // Extract end date and time from the appointment
+                        // $endDateTime = $appointment->m_end . '-' . $day . ' ' . $appointment->end . ':00';
+                        $endDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->end . ':00';
+    
+                        // Check if the appointment falls on the selected day
+                        if (date('l', strtotime($startDateTime)) == $selectedDay) {
+                            // Add the event to the events array
+                            $events[] = [
+                                'title' => $appointment->subject,
+                                'start' => $startDateTime,
+                                'end' => $endDateTime,
+                            ];
+                        }
                     }
                 }
             }
         }
+        // for ($day = 1; $day <= 31; $day++) {
+        //     // Loop through each appointment
+        //     foreach ($appointments as $appointment) {
+        //         // Split the days string into an array of individual days
+        //         $selectedDays = explode(',', $appointment->day);
+
+        //         // Loop through each selected day
+        //         foreach ($selectedDays as $selectedDay) {
+        //             // Extract start date and time from the appointment
+        //             $startDateTime = $appointment->month_start . '-' . $day . ' ' . $appointment->time_start . ':00';
+
+        //             // Extract end date and time from the appointment
+        //             $endDateTime = $appointment->month_start . '-' . $day . ' ' . $appointment->time_end . ':00';
+
+        //             // Check if the appointment falls on the selected day
+        //             if (date('l', strtotime($startDateTime)) == $selectedDay) {
+        //                 // Add the event to the events array
+        //                 $events[] = [
+        //                     'title' => $appointment->user_id,
+        //                     'start' => $startDateTime,
+        //                     'end' => $endDateTime,
+        //                     'description' => 'html: <b>' . $appointment->description . '</b>',
+        //                 ];
+        //             }
+        //         }
+        //     }
+        // }
         $users = User::select('users.id as id', 'users.name as name')->where('email_verified_at', '!=', null)
             ->join('role_user', 'users.id', '=', 'role_user.user_id')
             ->join('roles', 'role_user.role_id', '=', 'roles.id')
             ->where('roles.title', '=', 'Instructor')
             ->get();
-
+        // dd($events);
             // dd($users);
         $rooms = Rooms::all();
         $courses = Course::get();
-        return view('faculties.schedule.index', compact('lists', 'events', 'users', 'rooms', 'courses'));
+        return view('faculties.schedule.index', compact('lists', 'events', 'users', 'rooms', 'courses', 'user_id'));
     }
 
     public function studentSchedule(Request $request)
     {
         // dd($request->search);
+        $user_id = $request->search;
         abort_unless(Gate::allows('super_access'), 403);
         $events = [];
         $appointments = [];
         if ($request->search) {
-            $appointments = Schedule::join('appointments', 'schedules.appointment_id', '=', 'appointments.id')
-            ->join('courses', 'appointments.course_id', '=', 'courses.id')
-            ->where('schedules.user_id', '=', $request->search)->get();
-        }
-        for ($day = 1; $day <= 31; $day++) {
-            // Loop through each appointment
-            foreach ($appointments as $appointment) {
-                // Split the days string into an array of individual days
-                $selectedDays = explode(',', $appointment->day);
+            // $appointments = Schedule::join('appointments', 'schedules.appointment_id', '=', 'appointments.id')
+            // ->join('courses', 'appointments.course_id', '=', 'courses.id')
+            // ->where('schedules.user_id', '=', $request->search)->get();
 
-                // Loop through each selected day
-                foreach ($selectedDays as $selectedDay) {
-                    // Extract start date and time from the appointment
-                    $startDateTime = $appointment->month_start . '-' . $day . ' ' . $appointment->time_start . ':00';
+            $appointments = Appointment::select(
+                'courses.subject as subject',
+                'courses.subjectCode as code',
+                'courses.time_start as start',
+                'courses.time_end as end',
+                'rooms.name as room',
+                'courses.day as day',
+                'appointments.month_start as m_start',
+                'appointments.month_end as m_end',
+                'appointments.id as id',
+                'courses.subject as subject',
+                'courses.subjectCode as s_code'
+            )
+            ->join('courses', 'courses.id', '=', 'appointments.course_id')
+            ->join('rooms', 'courses.room_id', '=', 'rooms.id')
+                ->get();
+            
+            
+            $rscheds = Schedule::select(
+                'appointment_id',
+            )->where("user_id", $request->search)
+                ->get();
 
-                    // Extract end date and time from the appointment
-                    $endDateTime = $appointment->month_end . '-' . $day . ' ' . $appointment->time_end . ':00';
+            if(sizeof($rscheds) != 0){
+                $scheds = [];
 
-                    // Check if the appointment falls on the selected day
-                    if (date('l', strtotime($startDateTime)) == $selectedDay) {
-                        // Add the event to the events array
-                        $events[] = [
-                            'title' => $appointment->user_id,
-                            'start' => $startDateTime,
-                            'end' => $endDateTime,
-                            'description' => 'html: <b>' . $appointment->description . '</b>',
-                        ];
+                foreach ($rscheds as $rsched) {
+                    $scheds[] = $rsched->appointment_id;
+                }
+                
+                foreach ($appointments as $appointment) {
+                    if (in_array($appointment->id, $scheds)) {
+                        $filteredAppointments[] = $appointment;
+                    }
+                }
+
+                $appointments = $filteredAppointments;
+                
+                // dd($appointments, Auth::user()->id, sizeof($appointments) == 0, $scheds, $filteredAppointments);
+        
+                for ($day = 1; $day <= 31; $day++) {
+                    // Loop through each appointment
+                    foreach ($appointments as $appointment) {
+                        // Split the days string into an array of individual days
+                        $appointment->day = str_ireplace(' ', '', $appointment->day);
+                        $selectedDays = explode(',', $appointment->day);
+        
+                        // Loop through each selected day
+                        foreach ($selectedDays as $selectedDay) {
+                            // Extract start date and time from the appointment
+                            $startDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->start . ':00';
+        
+                            // Extract end date and time from the appointment
+                            // $endDateTime = $appointment->m_end . '-' . $day . ' ' . $appointment->end . ':00';
+                            $endDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->end . ':00';
+        
+                            // Check if the appointment falls on the selected day
+                            if (date('l', strtotime($startDateTime)) == $selectedDay) {
+                                // Add the event to the events array
+                                $events[] = [
+                                    'title' => $appointment->subject,
+                                    'start' => $startDateTime,
+                                    'end' => $endDateTime,
+                                ];
+                            }
+                        }
                     }
                 }
             }
+            
+            
+
+
         }
+        // for ($day = 1; $day <= 31; $day++) {
+        //     // Loop through each appointment
+        //     foreach ($appointments as $appointment) {
+        //         // Split the days string into an array of individual days
+        //         $selectedDays = explode(',', $appointment->day);
+
+        //         // Loop through each selected day
+        //         foreach ($selectedDays as $selectedDay) {
+        //             // Extract start date and time from the appointment
+        //             $startDateTime = $appointment->month_start . '-' . $day . ' ' . $appointment->time_start . ':00';
+
+        //             // Extract end date and time from the appointment
+        //             $endDateTime = $appointment->month_end . '-' . $day . ' ' . $appointment->time_end . ':00';
+
+        //             // Check if the appointment falls on the selected day
+        //             if (date('l', strtotime($startDateTime)) == $selectedDay) {
+        //                 // Add the event to the events array
+        //                 $events[] = [
+        //                     'title' => $appointment->user_id,
+        //                     'start' => $startDateTime,
+        //                     'end' => $endDateTime,
+        //                     'description' => 'html: <b>' . $appointment->description . '</b>',
+        //                 ];
+        //             }
+        //         }
+        //     }
+        // }
         $users = User::select('users.id as id', 'users.name as name')->where('email_verified_at', '!=', null)
             ->join('role_user', 'users.id', '=', 'role_user.user_id')
             ->join('roles', 'role_user.role_id', '=', 'roles.id')
             ->where('roles.title', '=', 'Student')
             ->get();
-        $subjects = Appointment::join('courses', 'appointments.course_id', '=', 'courses.id')->get();
+        $subjects = Appointment::select("*", "appointments.id as appointment_id")->join('courses', 'appointments.course_id', '=', 'courses.id')->get();
+
+
         // $subjects = Course::all();
         
-        return view('student.schedule.index', compact('events', 'users', 'subjects'));
+        return view('student.schedule.index', compact('events', 'users', 'subjects', 'user_id'));
     }
 
     public function viewSchedule()
