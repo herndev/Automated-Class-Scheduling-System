@@ -113,63 +113,54 @@
 
 
                             <!-- Modal -->
-                            <div id="editModal"
-                                class="modal fixed h-full top-48 left-0"
-                                style="display: none; z-index: 999 !important;">
-                                {{-- <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div> --}}
+<div id="editModal" class="modal fixed inset-0 flex items-center justify-center" style="display: none; z-index: 999 !important; ">
+    <div class="modal-container bg-gray-700 w-11/12 md:max-w-md mx-auto rounded shadow-lg overflow-y-auto">
 
-                                <div
-                                    class="modal-container bg-gray-700 w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+        <!-- Modal content -->
+        <div class="modal-content py-4 text-left px-6">
+            <!-- Title -->
+            <div class="flex justify-between items-center pb-3">
+                <p class="text-2xl font-bold text-white">Edit</p>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                        viewBox="0 0 18 18">
+                        <path d="M1 1l16 16m-16 0L17 1"></path>
+                    </svg>
+                </button>
+            </div>
+            <!-- Body -->
+            <form action="{{ route('faculty.update') }}" method="POST">
+                @csrf
+                <div class="mt-10 mb-5">
+                    <input type="hidden" name="id" id="in_id">
+                    <p class="text-white">Faculty Name:</p>
+                    <input type="text" id="in_name" name="name" class="w-full bg-white rounded-lg" placeholder="">
+                </div>
+                <div class="mb-5">
+                    <p class="text-white">ID No:</p>
+                    <input type="text" id="in_idNo" name="idNo" class="w-full bg-white rounded-lg" placeholder="">
+                </div>
+                <div class="mb-5">
+                    <p class="text-white">Email:</p>
+                    <input type="text" id="in_email" name="email" class="w-full bg-white rounded-lg" placeholder="">
+                </div>
+                <div class="mb-5">
+                    <p class="text-white">Contact:</p>
+                    <input type="text" id="in_contact" name="contact" class="w-full bg-white rounded-lg" placeholder="">
+                </div>
+                <!-- Footer -->
+                <div class="mt-4 flex justify-end">
+                    <button type="reset"
+                        class="px-4 bg-transparent p-3 rounded-lg text-white hover:bg-gray-100 hover:text-gray-900 mr-2"
+                        onclick="closeModal()">Cancel</button>
+                    <button type="submit"
+                        class="modal-close px-4 bg-gray-500 p-3 rounded-lg text-white hover:bg-gray-400">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-                                    <!-- Modal content -->
-                                    <div class="modal-content py-4 text-left px-6">
-                                        <!-- Title -->
-                                        <div class="flex justify-between items-center pb-3">
-                                            <p class="text-2xl font-bold text-white">Edit</p>
-                                            <button class="modal-close" onclick="closeModal()">
-                                                <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg"
-                                                    width="18" height="18" viewBox="0 0 18 18">
-                                                    <path d="M1 1l16 16m-16 0L17 1"></path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <!-- Body -->
-                                        <form action="{{ route('faculty.update') }}" method="POST">
-                                            @csrf
-                                            <div class="mt-10 mb-5">
-                                                <input type="hidden" name="id" id="in_id">
-                                                <p class="text-white">Faculty Name:</p>
-                                                <input type="text" id="in_name" name="name"
-                                                    class="w-full bg-white rounded-lg" placeholder="">
-                                            </div>
-                                            <div class="mb-5">
-                                                <p class="text-white">ID No:</p>
-                                                <input type="text" id="in_idNo" name="idNo"
-                                                    class="w-full bg-white rounded-lg" placeholder="">
-                                            </div>
-                                            <div class="mb-5">
-                                                <p class="text-white">Email:</p>
-                                                <input type="text" id="in_email" name="email"
-                                                    class="w-full bg-white rounded-lg" placeholder="">
-                                            </div>
-                                            <div class="mb-5">
-                                                <p class="text-white">Contact:</p>
-                                                <input type="text" id="in_contact" name="contact"
-                                                    class="w-full bg-white rounded-lg" placeholder="">
-                                            </div>
-                                            <!-- Footer -->
-                                            <div class="mt-4 flex justify-end">
-                                                <button type="reset"
-                                                    class="px-4 bg-transparent p-3 rounded-lg text-white hover:bg-gray-100 hover:text-gray-900 mr-2"
-                                                    onclick="closeModal()">Cancel</button>
-                                                <button type="submit"
-                                                    class="modal-close px-4 bg-gray-500 p-3 rounded-lg text-white hover:bg-gray-400">Save</button>
-                                            </div>
-                                        </form>
-
-                                    </div>
-                                </div>
-                            </div>
 
 
 

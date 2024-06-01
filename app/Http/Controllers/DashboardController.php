@@ -15,6 +15,7 @@ use App\Models\VehicleHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use DateTime;
 
 class DashboardController extends Controller
 {
@@ -98,6 +99,28 @@ class DashboardController extends Controller
         }
         
         // dd($appointments, Auth::user()->id, sizeof($appointments) == 0, $scheds, $filteredAppointments);
+        $max_months = 1;
+        foreach ($appointments as $appointment) {
+            $m_start = $appointment->m_start;
+            $m_end = $appointment->m_end;
+
+            // Convert date strings to DateTime objects
+            $startDate = new DateTime($m_start);
+            $endDate = new DateTime($m_end);
+
+            // Calculate the difference
+            $interval = $startDate->diff($endDate);
+
+            // Get the difference in months
+            $monthsDifference = $interval->y * 12 + $interval->m;
+
+            if($monthsDifference > $max_months){
+                $max_months = $monthsDifference;
+            }
+        }
+
+        $max_months = ($max_months * 31);
+
 
         for ($day = 1; $day <= 31; $day++) {
             // Loop through each appointment
@@ -108,22 +131,22 @@ class DashboardController extends Controller
 
                 // Loop through each selected day
                 foreach ($selectedDays as $selectedDay) {
-                    // Extract start date and time from the appointment
-                    $startDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->start . ':00';
+                    for ($i=$appointment->m_start; $i <= $appointment->m_end; $i++) { 
+                        // Extract start date and time from the appointment
+                        $startDateTime = $i . '-' . ($day <= 9 ? '0'.$day : $day) . ' ' . $appointment->start . ':00';
+                        $endDateTime = $i . '-' . ($day <= 9 ? '0'.$day : $day) . ' ' . $appointment->end . ':00';
 
-                    // Extract end date and time from the appointment
-                    // $endDateTime = $appointment->m_end . '-' . $day . ' ' . $appointment->end . ':00';
-                    $endDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->end . ':00';
-
-                    // Check if the appointment falls on the selected day
-                    if (date('l', strtotime($startDateTime)) == $selectedDay) {
-                        // Add the event to the events array
-                        $events[] = [
-                            'title' => $appointment->subject,
-                            'start' => $startDateTime,
-                            'end' => $endDateTime,
-                        ];
+                        // Check if the appointment falls on the selected day
+                        if (date('l', strtotime($startDateTime)) == $selectedDay) {
+                            // Add the event to the events array
+                            $events[] = [
+                                'title' => $appointment->subject,
+                                'start' => $startDateTime,
+                                'end' => $endDateTime,
+                            ];
+                        }
                     }
+                    
                 }
             }
         }
@@ -144,6 +167,8 @@ class DashboardController extends Controller
 
         $instructors = Appointment::with(['user'])->get();
         // dd($instructors);
+
+        // dd($events);
 
         return view('dashboard', compact('events', 'instructorCount', 'appointments', 'counts', 'roomsScheds', 'students', 'instructors'));
     }

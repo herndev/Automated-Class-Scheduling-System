@@ -216,8 +216,7 @@
                             </div>
                             <!-- Modal -->
                             <div id="editModal"
-                                class="modal fixed w-full h-full bottom-0 left-0 flex items-center justify-center overflow-y-auto"
-                                style="display: none; z-index: 999 !important; ">
+                            class="modal fixed inset-0 flex items-center justify-center" style="display: none; z-index: 999 !important; ">
                                 {{-- <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div> --}}
 
                                 <div
@@ -329,7 +328,7 @@
                                             <!-- Footer -->
                                             <div class="mt-4 flex justify-end">
                                                 <button type="reset"
-                                                    class="px-4 bg-transparent p-3 rounded-lg text-white hover:bg-gray-100 hover:text-red-400 mr-2"
+                                                    class="px-4 bg-transparent p-3 rounded-lg text-white hover:bg-gray-100 hover:text-gray-900 mr-2"
                                                     onclick="closeModal()">Cancel</button>
                                                 <button type="submit"
                                                     class="modal-close px-4 bg-gray-500 p-3 rounded-lg text-white hover:bg-gray-400">Save</button>
