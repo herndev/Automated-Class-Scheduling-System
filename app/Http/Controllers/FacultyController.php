@@ -243,11 +243,20 @@ class FacultyController extends Controller
             ->join('roles', 'role_user.role_id', '=', 'roles.id')
             ->where('roles.title', '=', 'Instructor')
             ->get();
+
+        $appointments = Appointment::select("*","appointments.id as id","rooms.name as room")
+            ->join('courses', 'courses.id', '=', 'appointments.course_id')
+            ->join('rooms', 'rooms.id', '=', 'courses.room_id')
+            ->where('appointments.user_id', $user_id)
+            ->get();
+
+        // dd($appointments);
+
         // dd($events);
             // dd($users);
         $rooms = Rooms::all();
         $courses = Course::get();
-        return view('faculties.schedule.index', compact('lists', 'events', 'users', 'rooms', 'courses', 'user_id'));
+        return view('faculties.schedule.index', compact('lists', 'events', 'users', 'rooms', 'courses', 'user_id', 'appointments'));
     }
 
     public function studentSchedule(Request $request)
@@ -370,10 +379,16 @@ class FacultyController extends Controller
             ->get();
         $subjects = Appointment::select("*", "appointments.id as appointment_id")->join('courses', 'appointments.course_id', '=', 'courses.id')->get();
 
+        $appointments = Schedule::select("*","schedules.id as id", "rooms.name as room")
+            ->join('appointments', 'appointments.id', '=', 'schedules.appointment_id')
+            ->join('courses', 'courses.id', '=', 'appointments.course_id')
+            ->join('rooms', 'rooms.id', '=', 'courses.room_id')
+            ->where('schedules.user_id', $user_id)
+            ->get();
 
         // $subjects = Course::all();
         
-        return view('student.schedule.index', compact('events', 'users', 'subjects', 'user_id'));
+        return view('student.schedule.index', compact('events', 'users', 'subjects', 'user_id', 'appointments'));
     }
 
     public function viewSchedule()

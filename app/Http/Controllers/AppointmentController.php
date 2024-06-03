@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateAppointmentRequest;
 use App\Models\Appointment;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -93,6 +94,26 @@ class AppointmentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $appointment = Appointment::find($id);
+
+        if ($appointment) {
+            $appointment->delete();
+            Schedule::where('appointment_id', $id)->delete();
+            return redirect()->back()->with('success', 'Appointment deleted successfully');
+        } else {
+            return redirect()->back()->with('error', 'Appointment not found');
+        }
+    }
+
+    public function destroy2($id)
+    {
+        $appointment = Schedule::find($id);
+
+        if ($appointment) {
+            $appointment->delete();
+            return redirect()->back()->with('success', 'Schedule deleted successfully');
+        } else {
+            return redirect()->back()->with('error', 'Schedule not found');
+        }
     }
 }

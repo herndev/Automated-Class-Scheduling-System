@@ -140,7 +140,7 @@ class DashboardController extends Controller
                         if (date('l', strtotime($startDateTime)) == $selectedDay) {
                             // Add the event to the events array
                             $events[] = [
-                                'title' => $appointment->subject,
+                                'title' => $appointment->subject . " (" . $appointment->code . ")",
                                 'start' => $startDateTime,
                                 'end' => $endDateTime,
                             ];

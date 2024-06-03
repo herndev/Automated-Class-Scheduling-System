@@ -59,7 +59,7 @@
                         @foreach ($appointments as $appointment)
                             <div class="bg-white m-4 rounded-lg p-4 mb-2">
                                 <div>{{ $appointment->type }} {{ $appointment->year }}</div>
-                                <div class="text-xs">{{ $appointment->subject }}</div>
+                                <div class="text-xs">{{ $appointment->code }} {{ $appointment->subject }}</div>
                                 <div class="text-xs">{{ date('g:i A', strtotime($appointment->start)) }} -
                                     {{ date('g:i A', strtotime($appointment->end)) }}</div>
                                 <div class="text-xs">{{ $appointment->day }}</div>
@@ -111,7 +111,7 @@
                         @foreach ($appointments as $appointment)
                             <div class="bg-white m-4 rounded-lg p-4 mb-2">
                                 <div>{{ $appointment->type }} {{ $appointment->year }}</div>
-                                <div class="text-xs">{{ $appointment->subject }}</div>
+                                <div class="text-xs">{{ $appointment->code }} {{ $appointment->subject }}</div>
                                 <div class="text-xs">{{ date('g:i A', strtotime($appointment->start)) }} -
                                     {{ date('g:i A', strtotime($appointment->end)) }}</div>
                                 <div class="text-xs">{{ $appointment->day }}</div>

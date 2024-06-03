@@ -66,6 +66,8 @@ Route::middleware('auth')->group(function () {
     Route::get('student-view', [\App\Http\Controllers\FacultyController::class, 'viewSchedule'])->name('student.view');
 
     Route::post('appointment', [\App\Http\Controllers\AppointmentController::class, 'store'])->name('appointment.store');
+    Route::delete('appointment/{id}', [\App\Http\Controllers\AppointmentController::class, 'destroy'])->name('appointment.destroy');
+    Route::delete('appointment2/{id}', [\App\Http\Controllers\AppointmentController::class, 'destroy2'])->name('appointment.destroy2');
 
     Route::get('course', [\App\Http\Controllers\CourseController::class, 'index'])->name('course.index');
     Route::post('course', [\App\Http\Controllers\CourseController::class, 'store'])->name('course.store');

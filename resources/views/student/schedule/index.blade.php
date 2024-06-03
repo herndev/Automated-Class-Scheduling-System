@@ -58,7 +58,7 @@
                                             </option>
                                             @foreach ($subjects as $subject)
                                                 <option value="{{ $subject->appointment_id }}">
-                                                    {{ $subject->subjectCode }}
+                                                    {{ $subject->subjectCode }} {{ $subject->subject }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -85,6 +85,39 @@
                     @endforeach
                 </select>
             </div>
+
+            <!-- Responsive table of appointments -->
+            @if (count($appointments) != 0)
+                <div class="overflow-x-auto mt-5">
+                    <table class="min-w-full bg-white border border-gray-200">
+                        <thead>
+                            <tr class="w-full bg-gray-100 border-b">
+                                <th class="py-2 px-4 text-left">Subject</th>
+                                <th class="py-2 px-4 text-left">Room</th>
+                                <th class="py-2 px-4 text-left">Time</th>
+                                <th class="py-2 px-4 text-left">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($appointments as $appointment)
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">{{ $appointment->subjectCode }} {{ $appointment->subject }}</td>
+                                    <td class="py-2 px-4">{{ $appointment->room }}</td>
+                                    <td class="py-2 px-4">{{ date("g:i A", strtotime($appointment->time_start)) }} - {{ date("g:i A", strtotime($appointment->time_end)) }}</td>
+                                    <td class="py-2 px-4">
+                                        <form action="{{ route('appointment.destroy2', $appointment->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+            
             <div class="rounded-lg bg-white ml-4 mt-14" style="border-radius: 5px;">
                 <div id="calendar" class="p-6"></div>
             </div>
