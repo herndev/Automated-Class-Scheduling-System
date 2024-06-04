@@ -58,7 +58,7 @@
                                             </option>
                                             @foreach ($courses as $course)
                                                 <option value="{{ $course->id }}">
-                                                    {{ $course->subjectCode }} {{ $course->subject }}
+                                                     {{ $course->subject }} {{ $course->subjectCode }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -125,7 +125,7 @@
                         <tbody>
                             @foreach ($appointments as $appointment)
                                 <tr class="border-b">
-                                    <td class="py-2 px-4">{{ $appointment->subjectCode }} {{ $appointment->subject }}</td>
+                                    <td class="py-2 px-4"> {{ $appointment->subject }} {{ $appointment->subjectCode }}</td>
                                     <td class="py-2 px-4">{{ $appointment->room }}</td>
                                     <td class="py-2 px-4">{{ date("g:i A", strtotime($appointment->time_start)) }} - {{ date("g:i A", strtotime($appointment->time_end)) }}</td>
                                     <td class="py-2 px-4">

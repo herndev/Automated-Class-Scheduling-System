@@ -12,6 +12,7 @@ use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use DateTime;
 
 class ScheduleController extends Controller
 {
@@ -135,21 +136,28 @@ class ScheduleController extends Controller
 
                 // Loop through each selected day
                 foreach ($selectedDays as $selectedDay) {
-                    // Extract start date and time from the appointment
-                    $startDateTime = $appointment->month_start . '-' . $day . ' ' . $appointment->time_start . ':00';
+                    $start_date = new DateTime($appointment->m_start . '-01');
+                    $end_date = new DateTime($appointment->m_end . '-01');
 
-                    // Extract end date and time from the appointment
-                    $endDateTime = $appointment->month_end . '-' . $day . ' ' . $appointment->time_end . ':00';
+                    // Loop through each month from start to end
+                    while ($start_date <= $end_date) {
+                        // Extract start date and time from the appointment
+                        $startDateTime = $start_date->format('Y-m') . '-' . ($day <= 9 ? '0'.$day : $day) . ' ' . $appointment->start . ':00';
+                        $endDateTime = $start_date->format('Y-m') . '-' . ($day <= 9 ? '0'.$day : $day) . ' ' . $appointment->end . ':00';
 
-                    // Check if the appointment falls on the selected day
-                    if (date('l', strtotime($startDateTime)) == $selectedDay) {
-                        // Add the event to the events array
-                        $events[] = [
-                            'title' => $appointment->user_id,
-                            'start' => $startDateTime,
-                            'end' => $endDateTime,
-                            'description' => 'html: <b>' . $appointment->description . '</b>',
-                        ];
+                        // Check if the appointment falls on the selected day
+                        if (date('l', strtotime($startDateTime)) == $selectedDay) {
+                            // Add the event to the events array
+                            $events[] = [
+                                'title' => $appointment->subject . " (" . $appointment->code . ")",
+                                'start' => $startDateTime,
+                                'end' => $endDateTime,
+                                'description' => 'html: <b>' . $appointment->description . '</b>',
+                            ];
+                        }
+
+                        // Move to the next month
+                        $start_date->modify('+1 month');
                     }
                 }
             }
@@ -255,21 +263,27 @@ class ScheduleController extends Controller
 
                 // Loop through each selected day
                 foreach ($selectedDays as $selectedDay) {
-                    // Extract start date and time from the appointment
-                    $startDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->start . ':00';
+                    $start_date = new DateTime($appointment->m_start . '-01');
+                    $end_date = new DateTime($appointment->m_end . '-01');
 
-                    // Extract end date and time from the appointment
-                    // $endDateTime = $appointment->m_end . '-' . $day . ' ' . $appointment->end . ':00';
-                    $endDateTime = $appointment->m_start . '-' . $day . ' ' . $appointment->end . ':00';
+                    // Loop through each month from start to end
+                    while ($start_date <= $end_date) {
+                        // Extract start date and time from the appointment
+                        $startDateTime = $start_date->format('Y-m') . '-' . ($day <= 9 ? '0'.$day : $day) . ' ' . $appointment->start . ':00';
+                        $endDateTime = $start_date->format('Y-m') . '-' . ($day <= 9 ? '0'.$day : $day) . ' ' . $appointment->end . ':00';
 
-                    // Check if the appointment falls on the selected day
-                    if (date('l', strtotime($startDateTime)) == $selectedDay) {
-                        // Add the event to the events array
-                        $events[] = [
-                            'title' => $appointment->subject,
-                            'start' => $startDateTime,
-                            'end' => $endDateTime,
-                        ];
+                        // Check if the appointment falls on the selected day
+                        if (date('l', strtotime($startDateTime)) == $selectedDay) {
+                            // Add the event to the events array
+                            $events[] = [
+                                'title' => $appointment->subject . " (" . $appointment->code . ")",
+                                'start' => $startDateTime,
+                                'end' => $endDateTime,
+                            ];
+                        }
+
+                        // Move to the next month
+                        $start_date->modify('+1 month');
                     }
                 }
             }

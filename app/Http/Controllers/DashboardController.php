@@ -97,30 +97,6 @@ class DashboardController extends Controller
 
             $appointments = $filteredAppointments;
         }
-        
-        // dd($appointments, Auth::user()->id, sizeof($appointments) == 0, $scheds, $filteredAppointments);
-        $max_months = 1;
-        foreach ($appointments as $appointment) {
-            $m_start = $appointment->m_start;
-            $m_end = $appointment->m_end;
-
-            // Convert date strings to DateTime objects
-            $startDate = new DateTime($m_start);
-            $endDate = new DateTime($m_end);
-
-            // Calculate the difference
-            $interval = $startDate->diff($endDate);
-
-            // Get the difference in months
-            $monthsDifference = $interval->y * 12 + $interval->m;
-
-            if($monthsDifference > $max_months){
-                $max_months = $monthsDifference;
-            }
-        }
-
-        $max_months = ($max_months * 31);
-
 
         for ($day = 1; $day <= 31; $day++) {
             // Loop through each appointment
@@ -131,10 +107,14 @@ class DashboardController extends Controller
 
                 // Loop through each selected day
                 foreach ($selectedDays as $selectedDay) {
-                    for ($i=$appointment->m_start; $i <= $appointment->m_end; $i++) { 
+                    $start_date = new DateTime($appointment->m_start . '-01');
+                    $end_date = new DateTime($appointment->m_end . '-01');
+
+                    // Loop through each month from start to end
+                    while ($start_date <= $end_date) {
                         // Extract start date and time from the appointment
-                        $startDateTime = $i . '-' . ($day <= 9 ? '0'.$day : $day) . ' ' . $appointment->start . ':00';
-                        $endDateTime = $i . '-' . ($day <= 9 ? '0'.$day : $day) . ' ' . $appointment->end . ':00';
+                        $startDateTime = $start_date->format('Y-m') . '-' . ($day <= 9 ? '0'.$day : $day) . ' ' . $appointment->start . ':00';
+                        $endDateTime = $start_date->format('Y-m') . '-' . ($day <= 9 ? '0'.$day : $day) . ' ' . $appointment->end . ':00';
 
                         // Check if the appointment falls on the selected day
                         if (date('l', strtotime($startDateTime)) == $selectedDay) {
@@ -145,6 +125,9 @@ class DashboardController extends Controller
                                 'end' => $endDateTime,
                             ];
                         }
+
+                        // Move to the next month
+                        $start_date->modify('+1 month');
                     }
                     
                 }
