@@ -39,7 +39,7 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="p-4">
                                         <label for="user_id" class="">Student</label>
-                                        <select name="user_id" id="user_id" class="rounded w-full mb-2">
+                                        <select name="user_id" onchange="selectStudent(this.value)" id="user_id" class="rounded w-full mb-2">
                                             <option>
                                                 Select
                                             </option>
@@ -56,11 +56,11 @@
                                             <option>
                                                 Select
                                             </option>
-                                            @foreach ($subjects as $subject)
+                                            {{-- @foreach ($subjects as $subject)
                                                 <option value="{{ $subject->appointment_id }}">
                                                      {{ $subject->subject }} {{ $subject->subjectCode }}
                                                 </option>
-                                            @endforeach
+                                            @endforeach --}}
                                         </select>
                                     </div>
                                 </div>
@@ -130,6 +130,9 @@
 
 </x-app-layout>
 <script>
+    var dd = <?php echo json_encode($scheds); ?>;
+    var cc = <?php echo json_encode($subjects); ?>;
+
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -157,6 +160,34 @@
                 // Handle the error response, if needed
                 console.log(xhr);
             }
+        });
+    }
+
+    function selectStudent(id) {
+        var ddf = dd[id.toString()];
+
+        // Reference to the select element
+        const courseSelect = document.getElementById('appointment_id');
+        // Empty the select element
+        courseSelect.innerHTML = '';
+       
+        // Filter courses, excluding those with id equal to 4
+        // const filteredCourses = courses.filter(course => course.id !== 4);
+        var filteredCourses = cc;
+        ddf.forEach(e => {
+            filteredCourses = filteredCourses.filter(course => course.appointment_id !== parseInt(e, 10))
+        });
+
+        const doption = document.createElement('option');
+        doption.textContent = `Select`;
+        courseSelect.appendChild(doption);
+
+        // Populate the select element with the filtered courses
+        filteredCourses.forEach(course => {
+            const option = document.createElement('option');
+            option.value = course.appointment_id;
+            option.textContent = `${course.subject} ${course.subjectCode}`;
+            courseSelect.appendChild(option);
         });
     }
 </script>

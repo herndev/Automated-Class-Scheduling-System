@@ -57,42 +57,59 @@ class ScheduleController extends Controller
 
     public function addSchedule(Request $request)
     {
-        try {
-            // $roles = User::find($request->user_id)->first()->roles;
-            // $role = "";
+        // Check conflicts
+        $has_conflict = 0;
+        $courses = Schedule::where('user_id', $request->user_id)->get();
+        $conflict_course = $courses;
+        $course22 = Appointment::find($request->appointment_id)->course_id;
+        $course2 = Course::find($course22);
 
-            // foreach ($roles as $key => $roless) {
-            //     if(in_array($roless->title,['Student', 'Instructor', 'SuperAdmin'])){
-            //         $role = $roless->title;
-            //         break;
-            //     }
-            // }
-            
-            $check = Schedule::where('appointment_id', $request->appointment_id)
-                ->where('user_id', $request->user_id)->first();
+        // Split the days string into an array of individual days
+        $course_day = str_ireplace(' ', '', $course2->day);
+        $selectedDays = explode(',', $course_day);
+        foreach ($courses as $course) {
+            // Check day conflict
+            // Split the days string into an array of individual days
+            $fcourse2 = Appointment::find($course->appointment_id)->course_id;
+            $fcourse = Course::find($fcourse2);
+            $course_day2 = str_ireplace(' ', '', $fcourse->day);
+            $selectedDays2 = explode(',', $course_day2);
 
-            // if($role == "Student"){
-            //     $check = Schedule::where('appointment_id', $request->appointment_id)
-            //     ->where('user_id', $request->user_id)->first();
-            // }
-                // dd($request->user_id, $request->appointment_id, ($check != null));
+            // Convert times to DateTime objects
+            $start1 = DateTime::createFromFormat('H:i', $course2->time_start);
+            $end1 = DateTime::createFromFormat('H:i', $course2->time_end);
+            $start2 = DateTime::createFromFormat('H:i', $fcourse->time_start);
+            $end2 = DateTime::createFromFormat('H:i', $fcourse->time_end);
 
-            if ($check != null) {
-                return redirect()->back()->with('success', 'Subject Already Exist!');
-            } else {
-                $add = new Schedule();
-                $add->user_id = $request->user_id;
-                $add->appointment_id = $request->appointment_id;
-                $add->save();
 
-                return redirect()->back()->with('success', 'Created Successfully');
+            foreach ($selectedDays as $day) {
+                if(in_array($day, $selectedDays2)){
+                    // Check for conflict
+                    if (($start1 < $end2 && $end1 > $start2) || ($start2 < $end1 && $end2 > $start1)) {
+                        $has_conflict = 1;
+                        $conflict_course = $fcourse;
+                        break;
+                    }
+                }
             }
 
-        } catch (\Throwable $th) {
-            // return response()->json($th, 400);
-            return redirect()->back()->with('success', response()->json($th, 400));
+            if($has_conflict){
+                break;
+            }
         }
-        return redirect()->back()->with('success', 'Something went wrong');
+        
+        if($has_conflict){
+            $course_name = $conflict_course->subject . " (" . $conflict_course->subjectCode . ")";
+            $time = DateTime::createFromFormat('H:i', $conflict_course->time_start)->format('g:i A') . " - " . DateTime::createFromFormat('H:i', $conflict_course->time_end)->format('g:i A');
+            return redirect()->back()->with('success', "Unsuccessful: Schedule is already occupied by $course_name $time.");
+        }
+
+        $add = new Schedule();
+        $add->user_id = $request->user_id;
+        $add->appointment_id = $request->appointment_id;
+        $add->save();
+
+        return redirect()->back()->with('success', 'Created Successfully');
     }
 
     public function subject(Request $request)

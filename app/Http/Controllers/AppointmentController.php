@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateAppointmentRequest;
 use App\Models\Appointment;
+use App\Models\Course;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
+use DateTime;
 
 class AppointmentController extends Controller
 {
@@ -37,6 +39,50 @@ class AppointmentController extends Controller
      */
     public function store(CreateAppointmentRequest $request)
     {
+        // Check conflicts
+        $has_conflict = 0;
+        $courses = Appointment::where('user_id', $request->user_id)->get();
+        $conflict_course = $courses;
+        $course2 = Course::find($request->course_id);
+
+        // Split the days string into an array of individual days
+        $course_day = str_ireplace(' ', '', $course2->day);
+        $selectedDays = explode(',', $course_day);
+        foreach ($courses as $course) {
+            // Check day conflict
+            // Split the days string into an array of individual days
+            $fcourse = Course::find($course->course_id);
+            $course_day2 = str_ireplace(' ', '', $fcourse->day);
+            $selectedDays2 = explode(',', $course_day2);
+
+            // Convert times to DateTime objects
+            $start1 = DateTime::createFromFormat('H:i', $course2->time_start);
+            $end1 = DateTime::createFromFormat('H:i', $course2->time_end);
+            $start2 = DateTime::createFromFormat('H:i', $fcourse->time_start);
+            $end2 = DateTime::createFromFormat('H:i', $fcourse->time_end);
+
+            foreach ($selectedDays as $day) {
+                if(in_array($day, $selectedDays2)){
+                    // Check for conflict
+                    if (($start1 < $end2 && $end1 > $start2) || ($start2 < $end1 && $end2 > $start1)) {
+                        $has_conflict = 1;
+                        $conflict_course = $fcourse;
+                        break;
+                    }
+                }
+            }
+
+            if($has_conflict){
+                break;
+            }
+        }
+        
+        if($has_conflict){
+            $course_name = $conflict_course->subject . " (" . $conflict_course->subjectCode . ")";
+            $time = DateTime::createFromFormat('H:i', $conflict_course->time_start)->format('g:i A') . " - " . DateTime::createFromFormat('H:i', $conflict_course->time_end)->format('g:i A');
+            return redirect()->back()->with('success', "Unsuccessful: Schedule is already occupied by $course_name $time.");
+        }
+
         $app = new Appointment();
         $app->user_id = $request->user_id;
         $app->course_id = $request->course_id;

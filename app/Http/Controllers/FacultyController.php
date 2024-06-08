@@ -258,13 +258,22 @@ class FacultyController extends Controller
             ->where('appointments.user_id', $user_id)
             ->get();
 
-        // dd($appointments);
+        $scheds = [];
+        $appointment2 = Appointment::all();
+        foreach ($users as $user) {
+            $scheds2 = [];
+            foreach ($appointment2 as $key => $appointment) {
+                if($appointment->user_id == $user->id){
+                    $scheds2[] = $appointment->course_id;
+                }
+            }
 
-        // dd($events);
-            // dd($users);
+            $scheds[$user->id] = $scheds2;
+        }
+
         $rooms = Rooms::all();
         $courses = Course::get();
-        return view('faculties.schedule.index', compact('lists', 'events', 'users', 'rooms', 'courses', 'user_id', 'appointments'));
+        return view('faculties.schedule.index', compact('lists', 'events', 'users', 'rooms', 'courses', 'user_id', 'appointments', 'scheds'));
     }
 
     public function studentSchedule(Request $request)
@@ -402,8 +411,21 @@ class FacultyController extends Controller
         // $subjects = Course::all();
 
         // dd($events);
+
+        $scheds = [];
+        $appointment2 = Schedule::all();
+        foreach ($users as $user) {
+            $scheds2 = [];
+            foreach ($appointment2 as $key => $appointment) {
+                if($appointment->user_id == $user->id){
+                    $scheds2[] = $appointment->appointment_id;
+                }
+            }
+
+            $scheds[$user->id] = $scheds2;
+        }
         
-        return view('student.schedule.index', compact('events', 'users', 'subjects', 'user_id', 'appointments'));
+        return view('student.schedule.index', compact('events', 'users', 'subjects', 'user_id', 'appointments', 'scheds'));
     }
 
     public function viewSchedule()

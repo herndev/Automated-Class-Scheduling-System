@@ -9,6 +9,7 @@ use App\Models\Course;
 use App\Models\Rooms;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use DateTime;
 
 class CourseController extends Controller
 {
@@ -47,6 +48,50 @@ class CourseController extends Controller
     public function store(CreateCourseRequest $request)
     {
         if ($request->validated()) {
+            $has_conflict = 0;
+            $courses = Course::get();
+            $conflict_course = $courses;
+
+            // Split the days string into an array of individual days
+            $course_day = str_ireplace(' ', '', $request->day);
+            $selectedDays = explode(',', $course_day);
+            foreach ($courses as $course) {
+                if($course->room_id == $request->room_id){
+                    // Check day conflict
+                    // Split the days string into an array of individual days
+                    $course_day2 = str_ireplace(' ', '', $course->day);
+                    $selectedDays2 = explode(',', $course_day2);
+
+                    // Convert times to DateTime objects
+                    $start1 = DateTime::createFromFormat('H:i', $request->time_start);
+                    $end1 = DateTime::createFromFormat('H:i', $request->time_end);
+                    $start2 = DateTime::createFromFormat('H:i', $course->time_start);
+                    $end2 = DateTime::createFromFormat('H:i', $course->time_end);
+
+                    foreach ($selectedDays as $day) {
+                        if(in_array($day, $selectedDays2)){
+                            // Check for conflict
+                            if (($start1 < $end2 && $end1 > $start2) || ($start2 < $end1 && $end2 > $start1)) {
+                                $has_conflict = 1;
+                                $conflict_course = $course;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if($has_conflict){
+                    break;
+                }
+            }
+            
+            if($has_conflict){
+                $course_name = $conflict_course->subject . " (" . $conflict_course->subjectCode . ")";
+                $room = Rooms::find($conflict_course->room_id)->name;
+                $time = DateTime::createFromFormat('H:i', $conflict_course->time_start)->format('g:i A') . " - " . DateTime::createFromFormat('H:i', $conflict_course->time_end)->format('g:i A');
+                return redirect()->back()->with('success', "Unsuccessful: $room is already occupied by $course_name $time.");
+            }
+
             $room = Course::create($request->all());
             $room->save();
 

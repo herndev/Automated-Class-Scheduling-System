@@ -39,7 +39,7 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="p-4">
                                         <label for="user_id" class="">Faculty</label>
-                                        <select name="user_id" id="user_id" class="rounded w-full mb-2">
+                                        <select onchange="selectFaculty(this.value)" name="user_id" id="user_id" class="rounded w-full mb-2" required>
                                             <option>
                                                 Select
                                             </option>
@@ -52,15 +52,10 @@
                                     </div>
                                     <div class="p-4">
                                         <label for="course_id" class="">Subject</label>
-                                        <select name="course_id" id="course_id" class="rounded w-full mb-2">
+                                        <select name="course_id" id="course_id" class="rounded w-full mb-2" required>
                                             <option>
                                                 Select
                                             </option>
-                                            @foreach ($courses as $course)
-                                                <option value="{{ $course->id }}">
-                                                     {{ $course->subject }} {{ $course->subjectCode }}
-                                                </option>
-                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -155,6 +150,9 @@
 
 </x-app-layout>
 <script>
+    var dd = <?php echo json_encode($scheds); ?>;
+    var cc = <?php echo json_encode($courses); ?>;
+
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -181,6 +179,34 @@
                 // Handle the error response, if needed
                 console.log(xhr);
             }
+        });
+    }
+
+    function selectFaculty(id) {
+        var ddf = dd[id.toString()];
+
+        // Reference to the select element
+        const courseSelect = document.getElementById('course_id');
+        // Empty the select element
+        courseSelect.innerHTML = '';
+       
+        // Filter courses, excluding those with id equal to 4
+        // const filteredCourses = courses.filter(course => course.id !== 4);
+        var filteredCourses = cc;
+        ddf.forEach(e => {
+            filteredCourses = filteredCourses.filter(course => course.id !== parseInt(e, 10))
+        });
+
+        const doption = document.createElement('option');
+        doption.textContent = `Select`;
+        courseSelect.appendChild(doption);
+
+        // Populate the select element with the filtered courses
+        filteredCourses.forEach(course => {
+            const option = document.createElement('option');
+            option.value = course.id;
+            option.textContent = `${course.subject} ${course.subjectCode}`;
+            courseSelect.appendChild(option);
         });
     }
 </script>
