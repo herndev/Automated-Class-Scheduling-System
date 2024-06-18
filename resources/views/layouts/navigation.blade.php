@@ -90,6 +90,7 @@
             </x-nav-link>
         @endcan
 
+
         {{-- @can('super_access')
             <x-nav-link href="{{ route('block.schedule') }}" :active="request()->routeIs('block.schedule')">
                 <x-slot name="icon">
@@ -118,6 +119,19 @@
             </x-nav-link>
         @endcan
 
+        @can('super_access')
+            <x-nav-link href="{{ route('users.listusers') }}" :active="request()->routeIs('users.listusers')">
+                <x-slot name="icon">
+                    <svg class="h-6 w-6 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" />
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 20v-2a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v2" />
+                    </svg>
+                </x-slot>
+                {{ __('Users') }}
+            </x-nav-link>
+        @endcan
         {{-- @can('super_access')
             <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.index')">
                 <x-slot name="icon">

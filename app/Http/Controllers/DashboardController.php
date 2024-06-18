@@ -31,6 +31,17 @@ class DashboardController extends Controller
         $roles = Auth::user()->roles;
         $role = "";
 
+        $semester = "1";
+        $cur_year = "2024";
+
+        if($request->semester == "2"){
+            $semester = "2";
+        }
+
+        if($request->year == "2023"){
+            $cur_year = "2023";
+        }
+        
         foreach ($roles as $key => $roless) {
             if(in_array($roless->title,['Student', 'Instructor', 'SuperAdmin'])){
                 $role = $roless->title;
@@ -53,7 +64,8 @@ class DashboardController extends Controller
         )->with(['user'])->where('user_id', Auth::user()->id)
             ->join('courses', 'appointments.course_id', '=', 'courses.id')
             ->join('rooms', 'courses.room_id', '=', 'rooms.id')
-            // ->where('appointments.semester', 'LIKE', "%" . $request->semester . "%")
+            ->where('courses.semester', 'LIKE', "%" . $semester . "%")
+            ->where('courses.year', $cur_year)
             ->get();
 
             $scheds = [];
@@ -75,6 +87,8 @@ class DashboardController extends Controller
             )
             ->join('courses', 'courses.id', '=', 'appointments.course_id')
             ->join('rooms', 'courses.room_id', '=', 'rooms.id')
+            ->where('courses.semester', 'LIKE', "%" . $semester . "%")
+            ->where('courses.year', $cur_year)
                 ->get();
             
             

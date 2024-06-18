@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
     Route::get('users/listusers', [\App\Http\Controllers\UserController::class, 'listusers'])->name('users.listusers');
+    Route::post('users/createuser', [\App\Http\Controllers\UserController::class, 'create_user'])->name('users.create_user');
+    Route::delete('users/destroyuser/{id}', [\App\Http\Controllers\UserController::class, 'destroy_user'])->name('users.destroy_user');
 
     Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');

@@ -6,6 +6,8 @@ use App\Http\Requests\CreateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
@@ -118,5 +120,46 @@ class UserController extends Controller
         $user->save();
 
         return redirect()->back()->with('success', 'User Unblock!');
+    }
+
+    public function listusers(){
+        $users = User::orderBy("id", "desc")->paginate();
+
+        return view('users.new_user', compact('users'));
+    }
+
+    public function create_user(Request $request)
+    {
+        $request->validate([
+            'role' => ['nullable'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+        
+        $role_id = 3;
+        if($request->role == "instructor"){
+            $role_id = 2;
+        }
+        User::findOrFail($user->id)->roles()->sync($role_id);
+        $users = User::orderBy("id", "desc")->paginate();
+
+        return redirect()->back()->with('success', 'Created Successfully');
+        // return view('users.new_user', compact('users'));
+    }
+
+    public function destroy_user($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        $users = User::orderBy("id", "desc")->paginate();
+
+        return redirect()->back()->with('success', 'User deleted successfully.');
     }
 }

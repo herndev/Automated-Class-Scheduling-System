@@ -44,6 +44,25 @@
         </div>
     @endif
     @can('user_access')
+        <div class="flex">
+            <div class="pr-10">
+                <select onchange="selectSemester(this.value)"
+                    class="w-36 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    placeholder="Semester" name="semester">
+                    <option value="1" {{ request()->query('semester') == '1' ? 'selected' : '' }}>1st Sem</option>
+                    <option value="2" {{ request()->query('semester') == '2' ? 'selected' : '' }}>2nd Sem</option>
+                </select>
+            </div>
+
+            <div>
+                <select onchange="selectYear(this.value)"
+                    class="w-36 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    placeholder="School Year" name="year">
+                    <option value="2024" {{ request()->query('year') == '2024' ? 'selected' : '' }}>2024</option>
+                    <option value="2023" {{ request()->query('year') == '2023' ? 'selected' : '' }}>2023</option>
+                </select>
+            </div>
+        </div>
         <div class="flex" style="padding-top: 10px; height: 100%;">
             <div class="w-2/5">
                 <div class="w-full bg-gray-800 rounded-lg p-4">
@@ -82,18 +101,18 @@
             <div class="pr-10">
                 <select onchange="selectSemester(this.value)"
                     class="w-36 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    placeholder="Semester">
-                    <option value="1" {{ request()->query('semester') == '1st' ? 'selected' : '' }}>1st Sem</option>
-                    <option value="2" {{ request()->query('semester') == '2nd' ? 'selected' : '' }}>2nd Sem</option>
+                    placeholder="Semester" name="semester">
+                    <option value="1" {{ request()->query('semester') == '1' ? 'selected' : '' }}>1st Sem</option>
+                    <option value="2" {{ request()->query('semester') == '2' ? 'selected' : '' }}>2nd Sem</option>
                 </select>
             </div>
 
             <div>
                 <select onchange="selectYear(this.value)"
                     class="w-36 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    placeholder="School Year">
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
+                    placeholder="School Year" name="year">
+                    <option value="2024" {{ request()->query('year') == '2024' ? 'selected' : '' }}>2024</option>
+                    <option value="2023" {{ request()->query('year') == '2023' ? 'selected' : '' }}>2023</option>
                 </select>
             </div>
         </div>

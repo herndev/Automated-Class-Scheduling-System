@@ -149,6 +149,17 @@ class FacultyController extends Controller
     public function schedule(Request $request)
     {
         $user_id = $request->search;
+        
+        $semester = "1";
+        $cur_year = "2024";
+
+        if($request->semester == "2"){
+            $semester = "2";
+        }
+
+        if($request->year == "2023"){
+            $cur_year = "2023";
+        }
 
         // dd($request->search);
         abort_unless(Gate::allows('super_access'), 403);
@@ -176,7 +187,8 @@ class FacultyController extends Controller
             )->with(['user'])->where('user_id', $user_id)
                 ->join('courses', 'appointments.course_id', '=', 'courses.id')
                 ->join('rooms', 'courses.room_id', '=', 'rooms.id')
-                // ->where('appointments.semester', 'LIKE', "%" . $request->semester . "%")
+                ->where('courses.semester', 'LIKE', "%" . $semester . "%")
+                ->where('courses.year', $cur_year)
                 ->get();
     
                 $scheds = [];
@@ -256,6 +268,8 @@ class FacultyController extends Controller
             ->join('courses', 'courses.id', '=', 'appointments.course_id')
             ->join('rooms', 'rooms.id', '=', 'courses.room_id')
             ->where('appointments.user_id', $user_id)
+            ->where('courses.semester', 'LIKE', "%" . $semester . "%")
+            ->where('courses.year', $cur_year)
             ->get();
 
         $scheds = [];
@@ -283,6 +297,18 @@ class FacultyController extends Controller
         abort_unless(Gate::allows('super_access'), 403);
         $events = [];
         $appointments = [];
+        
+        $semester = "1";
+        $cur_year = "2024";
+
+        if($request->semester == "2"){
+            $semester = "2";
+        }
+
+        if($request->year == "2023"){
+            $cur_year = "2023";
+        }
+
         if ($request->search) {
             // $appointments = Schedule::join('appointments', 'schedules.appointment_id', '=', 'appointments.id')
             // ->join('courses', 'appointments.course_id', '=', 'courses.id')
@@ -303,7 +329,12 @@ class FacultyController extends Controller
             )
             ->join('courses', 'courses.id', '=', 'appointments.course_id')
             ->join('rooms', 'courses.room_id', '=', 'rooms.id')
+            ->where('courses.semester', 'LIKE', "%" . $semester . "%")
+            ->where('courses.year', $cur_year)
                 ->get();
+
+            $scheds = [];
+            $filteredAppointments = [];
             
             
             $rscheds = Schedule::select(
@@ -406,6 +437,8 @@ class FacultyController extends Controller
             ->join('courses', 'courses.id', '=', 'appointments.course_id')
             ->join('rooms', 'rooms.id', '=', 'courses.room_id')
             ->where('schedules.user_id', $user_id)
+            ->where('courses.semester', 'LIKE', "%" . $semester . "%")
+            ->where('courses.year', $cur_year)
             ->get();
 
         // $subjects = Course::all();

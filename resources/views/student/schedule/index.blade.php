@@ -73,8 +73,22 @@
                     </div>
                 </div>
             </div>
-            <div class="text-center">
-                <select onchange="selectUser(this.value)" name="type" id="type" class="rounded w-1/2 mb-2">
+            <div class="mt-10">
+                <select onchange="selectSemester(this.value)"
+                    class="w-36 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    placeholder="Semester" name="semester">
+                    <option value="1" {{ request()->query('semester') == '1' ? 'selected' : '' }}>1st Sem</option>
+                    <option value="2" {{ request()->query('semester') == '2' ? 'selected' : '' }}>2nd Sem</option>
+                </select>
+                <select onchange="selectYear(this.value)"
+                    class="w-36 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    placeholder="School Year" name="year">
+                    <option value="2024" {{ request()->query('year') == '2024' ? 'selected' : '' }}>2024</option>
+                    <option value="2023" {{ request()->query('year') == '2023' ? 'selected' : '' }}>2023</option>
+                </select>
+                <select onchange="selectUser(this.value)" name="type" id="type"
+                    class="w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    placeholder="Instructors">
                     <option>
                         Select
                     </option>
@@ -126,7 +140,48 @@
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript"></script>
+    <script type="text/javascript">
+        function selectSemester(semester) {
+        console.log(true)
+        $.ajax({
+            type: 'GET',
+            url: 'schedule',
+            data: {
+                _token: '{{ csrf_token() }}',
+                search: semester,
+            },
+            success: function(data) {
+                var link = window.location.search
+                window.location.href = link == '' ? "schedule?_token={{ csrf_token() }}&semester=" +
+                    semester : link + "&semester=" + semester
+            },
+            error: function(xhr) {
+                // Handle the error response, if needed
+                console.log(xhr);
+            }
+        });
+    }
+
+    function selectYear(year) {
+        $.ajax({
+            type: 'GET',
+            url: 'schedule',
+            data: {
+                _token: '{{ csrf_token() }}',
+                search: year,
+            },
+            success: function(data) {
+                var link = window.location.search
+                window.location.href = link == '' ? "schedule?_token={{ csrf_token() }}&year=" + year :
+                    link + "&year=" + year
+            },
+            error: function(xhr) {
+                // Handle the error response, if needed
+                console.log(xhr);
+            }
+        });
+    }
+    </script>
 
 </x-app-layout>
 <script>
