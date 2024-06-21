@@ -33,8 +33,8 @@
                 </label>
             </div>
             <div>
-                <a class="block text-sm fontme text-red-700 hover:underline"
-                    href="{{ route('register') }}">{{ __('Register') }}</a>
+                {{-- <a class="block text-sm fontme text-red-700 hover:underline"
+                    href="{{ route('register') }}">{{ __('Register') }}</a> --}}
             </div>
             
         </div>
