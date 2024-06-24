@@ -188,7 +188,9 @@ class FacultyController extends Controller
                 ->join('courses', 'appointments.course_id', '=', 'courses.id')
                 ->join('rooms', 'courses.room_id', '=', 'rooms.id')
                 ->where('courses.semester', 'LIKE', "%" . $semester . "%")
-                ->where('courses.year', $cur_year)
+                ->whereRaw('SUBSTRING(appointments.month_start, 1, 4) = ?', $cur_year)
+                // ->where('YEAR(appointments.month_start) = ?', $cur_year)
+                // ->where('courses.year', $cur_year)
                 ->get();
     
                 $scheds = [];
@@ -269,7 +271,8 @@ class FacultyController extends Controller
             ->join('rooms', 'rooms.id', '=', 'courses.room_id')
             ->where('appointments.user_id', $user_id)
             ->where('courses.semester', 'LIKE', "%" . $semester . "%")
-            ->where('courses.year', $cur_year)
+            ->whereRaw('SUBSTRING(appointments.month_start, 1, 4) = ?', $cur_year)
+            // ->where('courses.year', $cur_year)
             ->get();
 
         $scheds = [];
@@ -330,7 +333,9 @@ class FacultyController extends Controller
             ->join('courses', 'courses.id', '=', 'appointments.course_id')
             ->join('rooms', 'courses.room_id', '=', 'rooms.id')
             ->where('courses.semester', 'LIKE', "%" . $semester . "%")
-            ->where('courses.year', $cur_year)
+            ->whereRaw('SUBSTRING(appointments.month_start, 1, 4) = ?', $cur_year)
+            // ->where('YEAR(appointments.month_start) = ?', $cur_year)
+            // ->where('courses.year', $cur_year)
                 ->get();
 
             $scheds = [];
@@ -438,7 +443,8 @@ class FacultyController extends Controller
             ->join('rooms', 'rooms.id', '=', 'courses.room_id')
             ->where('schedules.user_id', $user_id)
             ->where('courses.semester', 'LIKE', "%" . $semester . "%")
-            ->where('courses.year', $cur_year)
+            // ->where('courses.year', $cur_year)
+            ->whereRaw('SUBSTRING(appointments.month_start, 1, 4) = ?', $cur_year)
             ->get();
 
         // $subjects = Course::all();

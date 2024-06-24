@@ -65,7 +65,8 @@ class DashboardController extends Controller
             ->join('courses', 'appointments.course_id', '=', 'courses.id')
             ->join('rooms', 'courses.room_id', '=', 'rooms.id')
             ->where('courses.semester', 'LIKE', "%" . $semester . "%")
-            ->where('courses.year', $cur_year)
+            // ->where('courses.year', $cur_year)
+            ->whereRaw('SUBSTRING(appointments.month_start, 1, 4) = ?', $cur_year)
             ->get();
 
             $scheds = [];
@@ -88,7 +89,8 @@ class DashboardController extends Controller
             ->join('courses', 'courses.id', '=', 'appointments.course_id')
             ->join('rooms', 'courses.room_id', '=', 'rooms.id')
             ->where('courses.semester', 'LIKE', "%" . $semester . "%")
-            ->where('courses.year', $cur_year)
+            // ->where('courses.year', $cur_year)
+            ->whereRaw('SUBSTRING(appointments.month_start, 1, 4) = ?', $cur_year)
                 ->get();
             
             
